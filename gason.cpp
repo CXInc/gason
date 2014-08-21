@@ -23,7 +23,7 @@ void *JsonAllocator::allocate(size_t size) {
 	size_t allocSize = sizeof(Zone) + size;
 	Zone *zone = (Zone *)malloc(allocSize <= JSON_ZONE_SIZE ? JSON_ZONE_SIZE : allocSize);
 	zone->used = allocSize;
-	if (allocSize <= JSON_ZONE_SIZE || head == nullptr) {
+	if (allocSize <= JSON_ZONE_SIZE || head == NULL) {
 		zone->next = head;
 		head = zone;
 	} else {
@@ -109,11 +109,11 @@ static inline JsonNode *insertAfter(JsonNode *tail, JsonNode *node) {
 
 static inline JsonValue listToValue(JsonTag tag, JsonNode *tail) {
 	if (tail) {
-		auto head = tail->next;
-		tail->next = nullptr;
+		void* head = tail->next;
+		tail->next = NULL;
 		return JsonValue(tag, head);
 	}
-	return JsonValue(tag, nullptr);
+	return JsonValue(tag, NULL);
 }
 
 JsonParseStatus jsonParse(char *s, char **endptr, JsonValue *value, JsonAllocator &allocator) {
@@ -260,33 +260,33 @@ JsonParseStatus jsonParse(char *s, char **endptr, JsonValue *value, JsonAllocato
 				return JSON_PARSE_STACK_UNDERFLOW;
 			if (tags[pos] != JSON_TAG_OBJECT)
 				return JSON_PARSE_MISMATCH_BRACKET;
-			if (keys[pos] != nullptr)
+			if (keys[pos] != NULL)
 				return JSON_PARSE_UNEXPECTED_CHARACTER;
 			o = listToValue(JSON_TAG_OBJECT, tails[pos--]);
 			break;
 		case '[':
 			if (++pos == JSON_STACK_SIZE)
 				return JSON_PARSE_STACK_OVERFLOW;
-			tails[pos] = nullptr;
+			tails[pos] = NULL;
 			tags[pos] = JSON_TAG_ARRAY;
-			keys[pos] = nullptr;
+			keys[pos] = NULL;
 			separator = true;
 			continue;
 		case '{':
 			if (++pos == JSON_STACK_SIZE)
 				return JSON_PARSE_STACK_OVERFLOW;
-			tails[pos] = nullptr;
+			tails[pos] = NULL;
 			tags[pos] = JSON_TAG_OBJECT;
-			keys[pos] = nullptr;
+			keys[pos] = NULL;
 			separator = true;
 			continue;
 		case ':':
-			if (separator || keys[pos] == nullptr)
+			if (separator || keys[pos] == NULL)
 				return JSON_PARSE_UNEXPECTED_CHARACTER;
 			separator = true;
 			continue;
 		case ',':
-			if (separator || keys[pos] != nullptr)
+			if (separator || keys[pos] != NULL)
 				return JSON_PARSE_UNEXPECTED_CHARACTER;
 			separator = true;
 			continue;
@@ -311,7 +311,7 @@ JsonParseStatus jsonParse(char *s, char **endptr, JsonValue *value, JsonAllocato
 			}
 			tails[pos] = insertAfter(tails[pos], (JsonNode *)allocator.allocate(sizeof(JsonNode)));
 			tails[pos]->key = keys[pos];
-			keys[pos] = nullptr;
+			keys[pos] = NULL;
 		} else {
 			tails[pos] = insertAfter(tails[pos], (JsonNode *)allocator.allocate(sizeof(JsonNode) - sizeof(char *)));
 		}
